@@ -1,0 +1,28 @@
+name: Show SPN from Azure Key Vault
+
+on:
+  workflow_dispatch:
+
+jobs:
+  show-spn:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Fetch SPN details from Key Vault
+      uses: azure/cli@v2
+      with:
+        inlineScript: |
+          echo "Fetching SPN details from Key Vault: dev_az_spn"
+
+          CLIENT_ID=$(az keyvault secret show --vault-name dev_az_spn --name spn-client-id --query value -o tsv)
+          CLIENT_SECRET=$(az keyvault secret show --vault-name dev_az_spn --name spn-client-secret --query value -o tsv)
+          TENANT_ID=$(az keyvault secret show --vault-name dev_az_spn --name spn-tenant-id --query value -o tsv)
+
+          echo "SPN Client ID: $CLIENT_ID"
+          echo "SPN Secret: $CLIENT_SECRET"
+          echo "Tenant ID: $TENANT_ID"
